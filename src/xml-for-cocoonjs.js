@@ -1776,7 +1776,7 @@
       /**
        * Creates and pushes a new CDATA node to the children array
        * @method XmlElement._cdata
-       * @param {string} text The text to be used for creation of a CDATA node
+       * @param {string} cdata The text to be used for creation of a CDATA node
        * @private
        */
       _cdata: function(cdata) {
@@ -1790,7 +1790,7 @@
        * Will return all children with "*"
        * @method XmlElement.getElementsByTagName
        * @param {string} name The tag name to search for
-       * @returns {array | boolean} If any matches were found, an array. If not, "false"
+       * @returns {Array | boolean} If any matches were found, an array. If not, "false"
        * @public
        */
       getElementsByTagName: function(name) {
@@ -1803,7 +1803,7 @@
           }
           if (!!this.children[i].children && this.children[i].children.length > 0) {
             if ((r = this.children[i].getElementsByTagName(name))) {
-              return r;
+              results = results.concat(r);
             }
           }
         }
@@ -1818,7 +1818,7 @@
        * Retrieves an array matching the attribute of name specified.
        * @method XmlElement.getElementsByName
        * @param {string} name The attribute of name to search for
-       * @returns {array | boolean} If any matches were found, an array. If not, "false"
+       * @returns {Array | boolean} If any matches were found, an array. If not, "false"
        * @public
        */
       getElementsByName: function(name) {
@@ -1832,7 +1832,7 @@
           }
           if (!!this.children[i].children && this.children[i].children.length > 0) {
             if ((r = this.children[i].getElementsByName(name))) {
-              return r;
+              results = results.concat(r);
             }
           }
         }
@@ -2265,7 +2265,7 @@
        * Will return all children with "*"
        * @method XmlDocument.getElementsByTagName
        * @param {string} name The tag name to search for
-       * @returns {array | boolean} If any matches were found, an array. If not, "false"
+       * @returns {Array | boolean} If any matches were found, an array. If not, "false"
        * @public
        */
       getElementsByTagName: function(name) {
@@ -2293,7 +2293,7 @@
        * Retrieves an array matching the attribute of name specified.
        * @method XmlDocument.getElementsByName
        * @param {string} name The attribute of name to search for
-       * @returns {array | boolean} If any matches were found, an array. If not, "false"
+       * @returns {Array | boolean} If any matches were found, an array. If not, "false"
        * @public
        */
       getElementsByName: function(name) {
