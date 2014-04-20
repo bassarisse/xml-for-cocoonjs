@@ -1815,6 +1815,109 @@
         }
       },
       /**
+       * Retrieves an array matching the selector specified.
+       * @method XmlElement.querySelectorAll
+       * @param {string} selector The selector to search for
+       * @returns {Array} An array with the matches found
+       * @public
+       */
+      querySelectorAll: function (selector) {
+
+        var run = function (searchNode, selector) {
+
+          var checkNode = function (node, selectorPartInfos) {
+            var ok = true;
+            var selectorPartInfosLength = selectorPartInfos.length;
+            for (var selectorPartInfosIndex = 0; selectorPartInfosIndex < selectorPartInfosLength; selectorPartInfosIndex++) {
+              var selectorPartInfo = selectorPartInfos[selectorPartInfosIndex];
+              switch (selectorPartInfo.charAt(0)) {
+              case "[":
+                var attr = selectorPartInfo.substr(1, selectorPartInfo.length - 2).split("=");
+                var attrName = attr[0];
+                var attrValue = attr[1];
+                if (!node.getAttribute(attrName)) {
+                  ok = false;
+                } else if (attrValue) {
+                  attrValue = attrValue.replace(/^['"]|['"]$/g, "");
+                  if (node.getAttribute(attrName) != attrValue)
+                    ok = false;
+                }
+                break;
+              default:
+                if (node.name.toLowerCase() != selectorPartInfo.toLowerCase())
+                  ok = false;
+                break;
+              }
+              if (!ok)
+                break;
+            }
+            return ok;
+          };
+
+          var selectorParts = selector.split(/[ >]+/),
+            selectorDividers = selector.match(/[ >]+/g) || [],
+            currentResultNodes = [searchNode];
+
+          var selectorPartLength = selectorParts.length;
+          while (selectorDividers.length < selectorPartLength) {
+            selectorDividers.unshift(" ");
+          }
+
+          for (var selectorPartIndex = 0; selectorPartIndex < selectorPartLength; selectorPartIndex++) {
+            var selectorPart = selectorParts[selectorPartIndex];
+            var selectorDivider = selectorDividers[selectorPartIndex];
+            if (selectorDivider)
+              selectorDivider = selectorDivider.replace(/^ +| +$/g, "");
+
+            var nodes = currentResultNodes.slice(0);
+            currentResultNodes = [];
+            var selectorPartInfos = selectorPart.match(/[#.[]?[a-z_-]+(?:='[^']+'|="[^"]+")?]?/gi);
+            var nodesLength = nodes.length;
+
+            if (selectorPartIndex === 0 && selectorPartLength > 1 && nodesLength === 1) {
+              var firstNode = nodes[0];
+              if (checkNode(firstNode, selectorPartInfos))
+                currentResultNodes.push(firstNode);
+            }
+
+            for (var nodeIndex = 0; nodeIndex < nodesLength; nodeIndex++) {
+              var node = nodes[nodeIndex];
+              var nodesToCheck = selectorDivider === ">" ? node.children : node.getElementsByTagName("*");
+              if (!nodesToCheck)
+                continue;
+              var nodesToCheckLength = nodesToCheck.length;
+              for (var nodesToCheckIndex = 0; nodesToCheckIndex < nodesToCheckLength; nodesToCheckIndex++) {
+                var nodeToCheck = nodesToCheck[nodesToCheckIndex];
+                if (checkNode(nodeToCheck, selectorPartInfos))
+                  currentResultNodes.push(nodeToCheck);
+              }
+            }
+          }
+          return currentResultNodes;
+        };
+
+        var selectors = selector.split(","),
+          selectorsLength = selectors.length,
+          foundNodes = [];
+
+        for (var i = 0; i < selectorsLength; i++) {
+          foundNodes = foundNodes.concat(run(this, selectors[i]));
+        }
+
+        return foundNodes;
+      },
+      /**
+       * Retrieves the first element matching the selector specified.
+       * @method XmlElement.querySelector
+       * @param {string} selector The selector to search for
+       * @returns {XmlElement|null} If any matches were found, an element. If not, "null"
+       * @public
+       */
+      querySelector: function (selector) {
+        var foundNodes = this.querySelectorAll(selector);
+        return foundNodes.length > 0 ? foundNodes[0] : null;
+      },
+      /**
        * Retrieves an array matching the attribute of name specified.
        * @method XmlElement.getElementsByName
        * @param {string} name The attribute of name to search for
