@@ -125,7 +125,7 @@
   /**
    * @overview
    *
-   * v0.8
+   * v0.8.6
    *
    * By Dan Cox http://www.videlais.com @videlais
    *
@@ -1717,7 +1717,7 @@
         child.parentNode = this;
         this.children.push(child);
 
-        if (!this.firstChild)
+        if (this.firstChild === null)
         {
           this.firstChild = child;
         }
@@ -1745,7 +1745,16 @@
         if (text)
         {
           if (/[^\s]/.test(text)) {
-            this.children.push(new Text(text, this));
+
+            var child = new Text(text, this);
+
+            this.children.push(child);
+
+            if (this.firstChild === null)
+            {
+              this.firstChild = child;
+            }
+            this.lastChild = child;
           }
         }
       },
@@ -1758,7 +1767,16 @@
       _comment: function(text) {
         if (text)
         {
-          this.children.push(new Comment(text, this));
+          var child = new Comment(text, this);
+
+          this.children.push(child);
+
+          if (this.firstChild === null)
+          {
+            this.firstChild = child;
+          }
+          this.lastChild = child;
+
         }
       },
       /**
@@ -1770,7 +1788,15 @@
       _processingInstruction: function(text) {
         if (text)
         {
-          this.children.push(new ProcessingInstruction(text, this));
+          var child = new ProcessingInstruction(text, this);
+
+          this.children.push(child);
+
+          if (this.firstChild === null)
+          {
+            this.firstChild = child;
+          }
+          this.lastChild = child;
         }
       },
       /**
@@ -1782,7 +1808,15 @@
       _cdata: function(cdata) {
         if (cdata)
         {
-          this.children.push(new CDATA(cdata, this));
+          var child = new CDATA(cdata, this);
+
+          this.children.push(child);
+
+          if (this.firstChild === null)
+          {
+            this.firstChild = child;
+          }
+          this.lastChild = child;
         }
       },
       /**
@@ -1790,7 +1824,7 @@
        * Will return all children with "*"
        * @method XmlElement.getElementsByTagName
        * @param {string} name The tag name to search for
-       * @returns {Array | boolean} If any matches were found, an array. If not, "false"
+       * @returns {Array} An array containing any matches
        * @public
        */
       getElementsByTagName: function(name) {
@@ -1807,12 +1841,7 @@
             }
           }
         }
-
-        if (results.length > 0) {
-          return results;
-        } else {
-          return false;
-        }
+        return results;
       },
       /**
        * Retrieves an array matching the selector specified.
@@ -1921,7 +1950,7 @@
        * Retrieves an array matching the attribute of name specified.
        * @method XmlElement.getElementsByName
        * @param {string} name The attribute of name to search for
-       * @returns {Array | boolean} If any matches were found, an array. If not, "false"
+       * @returns {Array} An array containing any matches
        * @public
        */
       getElementsByName: function(name) {
@@ -1939,12 +1968,7 @@
             }
           }
         }
-
-        if (results.length > 0) {
-          return results;
-        } else {
-          return false;
-        }
+        return results;
       },
       /**
        * Returns if XmlElement has an attribute or not
@@ -2320,12 +2344,7 @@
        * @private
        */
       _text: function(text) {
-        if (text)
-        {
-          if (/[^\s]/.test(text)) {
-            this.children.push(new Text(text, this));
-          }
-        }
+        XmlElement.prototype._text.apply(this.documentElement, arguments);
       },
       /**
        * Creates and pushes a new ProcessingInstruction node to the children array
@@ -2334,10 +2353,7 @@
        * @private
        */
       _processingInstruction: function(text) {
-        if (text)
-        {
-          this.children.push(new ProcessingInstruction(text, this));
-        }
+        XmlElement.prototype._processingInstruction.apply(this.documentElement, arguments);
       },
       /**
        * Creates and pushes a new Comment node to the children array
@@ -2346,10 +2362,7 @@
        * @private
        */
       _comment: function(text) {
-        if (text)
-        {
-          this.children.push(new Comment(text, this));
-        }
+        XmlElement.prototype._comment.apply(this.documentElement, arguments);
       },
       /**
        * Creates and pushes a new CDATA node to the children array
@@ -2358,17 +2371,14 @@
        * @private
        */
       _cdata: function(cdata) {
-        if (cdata)
-        {
-          this.children.push(new CDATA(cdata, this));
-        }
+        XmlElement.prototype._cdata.apply(this.documentElement, arguments);
       },
       /**
        * Retrieves an array matching the name specified.
        * Will return all children with "*"
        * @method XmlDocument.getElementsByTagName
        * @param {string} name The tag name to search for
-       * @returns {Array | boolean} If any matches were found, an array. If not, "false"
+       * @returns {Array} An array containing any matches
        * @public
        */
       getElementsByTagName: function(name) {
@@ -2381,22 +2391,17 @@
           }
           if (!!this.children[i].children && this.children[i].children.length > 0) {
             if ((r = this.children[i].getElementsByTagName(name))) {
-              return r;
+              results = results.concat(r);
             }
           }
         }
-
-        if (results.length > 0) {
-          return results;
-        } else {
-          return false;
-        }
+        return results;
       },
       /**
        * Retrieves an array matching the attribute of name specified.
        * @method XmlDocument.getElementsByName
        * @param {string} name The attribute of name to search for
-       * @returns {Array | boolean} If any matches were found, an array. If not, "false"
+       * @returns {Array} An array containing any matches
        * @public
        */
       getElementsByName: function(name) {
@@ -2410,16 +2415,11 @@
           }
           if (!!this.children[i].children && this.children[i].children.length > 0) {
             if ((r = this.children[i].getElementsByName(name))) {
-              return r;
+              results = results.concat(r);
             }
           }
         }
-
-        if (results.length > 0) {
-          return results;
-        } else {
-          return false;
-        }
+        return results;
       },
       /**
        * Creates a XmlElement node of tag name and returns it

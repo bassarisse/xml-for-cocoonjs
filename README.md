@@ -1,7 +1,7 @@
 XML for CocoonJS
 ================
 
-Version 0.8.5 (beta)
+Version 0.8.6 (beta)
 
 Combining a substantial re-write of [xmldoc](https://github.com/nfarina/xmldoc) and the [sax.js](https://github.com/isaacs/sax-js) Node.js modules, this serves to re-create the DOMParser object in user agents (like CocoonJS) that do not have native XML parsing. It also adds support for most DOM Core Level 1 XML operations.
 
